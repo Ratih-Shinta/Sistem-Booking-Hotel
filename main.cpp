@@ -3,7 +3,7 @@
 #include <string.h>
 
 /*
-Struktur node ku taro sini
+Struktur node
 */
 #define RED 0
 #define BLACK 1
@@ -29,20 +29,29 @@ void leftRotate(tnodes *x);
 void rightRotate(tnodes *x);
 void fixInsert(tnodes *z);
 void insertRoom(int roomNumber, char roomType[], int price);
-void viewAllRooms(tnodes *node);
 void insertRoomMenu();
+tnodes* searchRoom(int roomNumber);
+void searchRoomMenu();
+void bookRoom(int roomNumber, char customerName[]);
+void bookRoomMenu();
 
 
 /*
 ini function main
 */
-int main() { 
-    insertRoomMenu();
+int main() {
+    insertRoomMenu(); 
+    searchRoomMenu(); 
+    bookRoomMenu();
+
     return 0;
 }
 
+
 /*
-semua fitur function ditaro disini
+=======================
+  CREATE NODE
+=======================
 */
 tnodes* createNode(int roomNumber, char roomType[], int price) {
     tnodes* newNode = (tnodes*) malloc(sizeof(tnodes));
@@ -51,7 +60,7 @@ tnodes* createNode(int roomNumber, char roomType[], int price) {
     strcpy(newNode->roomType, roomType);
     newNode->price = price;
     strcpy(newNode->status, "avail");
-    strcpy(newNode->bookedBy, "NULL");
+    strcpy(newNode->bookedBy, "-");
 
     newNode->color = RED;
     newNode->left = NULL;
@@ -61,6 +70,12 @@ tnodes* createNode(int roomNumber, char roomType[], int price) {
     return newNode;
 }
 
+
+/*
+=======================
+  ROTASI
+=======================
+*/
 void leftRotate(tnodes *x) {
     tnodes *y = x->right;
     x->right = y->left;
@@ -101,6 +116,12 @@ void rightRotate(tnodes *x) {
     x->parent = y;
 }
 
+
+/*
+=======================
+  FIX INSERT (COLORING)
+=======================
+*/
 void fixInsert(tnodes *z) {
     while (z->parent != NULL && z->parent->color == RED) {
         tnodes *grandparent = z->parent->parent;
@@ -147,6 +168,12 @@ void fixInsert(tnodes *z) {
     root->color = BLACK;
 }
 
+
+/*
+=======================
+  INSERT ROOM
+=======================
+*/
 void insertRoom(int roomNumber, char roomType[], int price) {
     tnodes *newNode = createNode(roomNumber, roomType, price);
 
@@ -161,7 +188,7 @@ void insertRoom(int roomNumber, char roomType[], int price) {
         else if (roomNumber > x->roomNumber)
             x = x->right;
         else {
-            printf("Room number sudah ada!\n");
+            printf("Kamar nomor %d sudah ada!\n", roomNumber);
             free(newNode);
             return;
         }
@@ -178,7 +205,7 @@ void insertRoom(int roomNumber, char roomType[], int price) {
 
     fixInsert(newNode);
 
-    printf("Room %d berhasil ditambahkan!\n", roomNumber);
+    printf("Kamar %d berhasil ditambahkan!\n", roomNumber);
 }
 
 void insertRoomMenu() {
@@ -188,19 +215,98 @@ void insertRoomMenu() {
     char choice;
 
     do {
+        printf("\n=== TAMBAH KAMAR ===\n");
         printf("Nomor kamar  : ");
         scanf("%d", &roomNumber);
 
         printf("Tipe kamar   : ");
         scanf(" %[^\n]", roomType);
 
-        printf("Harga        : ");
+        printf("Harga        : Rp");
         scanf("%d", &price);
 
         insertRoom(roomNumber, roomType, price);
 
-        printf("\nInput kamar lagi? [y/n]: ");
+        printf("Input kamar lagi? [y/n]: ");
         scanf(" %c", &choice);
 
     } while (choice == 'y' || choice == 'Y');
+}
+
+
+tnodes* searchRoom(int roomNumber) {
+    tnodes *current = root;
+
+    while (current != NULL) {
+        if (roomNumber == current->roomNumber)
+            return current;
+        else if (roomNumber < current->roomNumber)
+            current = current->left;
+        else
+            current = current->right;
+    }
+
+    return NULL;
+}
+
+void searchRoomMenu() {
+    int roomNumber;
+
+    printf("\n=== CARI KAMAR ===\n");
+    printf("Nomor kamar: ");
+    scanf("%d", &roomNumber);
+
+    tnodes *found = searchRoom(roomNumber);
+
+    if (found == NULL) {
+        printf("Kamar %d tidak ditemukan.\n", roomNumber);
+    } else {
+        printf("\n--- Detail Kamar ---\n");
+        printf("Nomor        : %d\n", found->roomNumber);
+        printf("Tipe         : %s\n", found->roomType);
+        printf("Harga        : Rp%d\n", found->price);
+        printf("Status       : %s\n", found->status);
+        printf("Dipesan oleh : %s\n", found->bookedBy);
+    }
+}
+
+
+/*
+=======================
+  BOOKING ROOM
+=======================
+*/
+void bookRoom(int roomNumber, char customerName[]) {
+    tnodes *target = searchRoom(roomNumber);
+
+    if (target == NULL) {
+        printf("Kamar %d tidak ditemukan.\n", roomNumber);
+        return;
+    }
+
+    if (strcmp(target->status, "booked") == 0) {
+        printf("Kamar %d sudah dipesan oleh %s.\n",
+               roomNumber, target->bookedBy);
+        return;
+    }
+
+    strcpy(target->status, "booked");
+    strcpy(target->bookedBy, customerName);
+
+    printf("Kamar %d berhasil dipesan oleh %s!\n",
+           roomNumber, customerName);
+}
+
+void bookRoomMenu() {
+    int roomNumber;
+    char customerName[50];
+
+    printf("\n=== BOOKING KAMAR ===\n");
+    printf("Nomor kamar  : ");
+    scanf("%d", &roomNumber);
+
+    printf("Nama pemesan : ");
+    scanf(" %[^\n]", customerName);
+
+    bookRoom(roomNumber, customerName);
 }
