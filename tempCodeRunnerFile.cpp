@@ -258,7 +258,12 @@ void searchRoomMenu() {
     }
 }
 
-// BOOKING ROOM
+
+/*
+=======================
+  BOOKING ROOM
+=======================
+*/
 void bookRoom(int roomNumber, char customerName[]) {
     tnodes *target = searchRoom(roomNumber);
 
@@ -294,7 +299,11 @@ void bookRoomMenu() {
     bookRoom(roomNumber, customerName);
 }
 
-// CANCEL BOOKING
+/*
+=======================
+  CANCEL BOOKING
+=======================
+*/
 void cancelBooking(int roomNumber) {
     tnodes *target = searchRoom(roomNumber);
 
@@ -325,7 +334,11 @@ void cancelBookingMenu() {
     cancelBooking(roomNumber);
 }
 
-//  transplant (helper delete)
+/*
+=======================
+  TRANSPLANT (helper delete)
+=======================
+*/
 void transplant(tnodes *u, tnodes *v) {
     if (u->parent == NULL)
         root = v;
@@ -339,7 +352,11 @@ void transplant(tnodes *u, tnodes *v) {
 }
 
 
-// find minimum
+/*
+=======================
+  FIND MINIMUM (helper delete)
+=======================
+*/
 tnodes* findMinimum(tnodes *node) {
     while (node->left != NULL)
         node = node->left;
@@ -347,13 +364,17 @@ tnodes* findMinimum(tnodes *node) {
 }
 
 
-// fix delete
+/*
+=======================
+  FIX DELETE (RECOLORING)
+=======================
+*/
 void fixDelete(tnodes *x, tnodes *xParent) {
     while (x != root && (x == NULL || x->color == BLACK)) {
         if (x == xParent->left) {
             tnodes *w = xParent->right; // sibling
 
-            // sibling merah
+            // Case 1: sibling merah
             if (w != NULL && w->color == RED) {
                 w->color = BLACK;
                 xParent->color = RED;
@@ -361,7 +382,7 @@ void fixDelete(tnodes *x, tnodes *xParent) {
                 w = xParent->right;
             }
 
-            // kedua anak sibling hitam
+            // Case 2: kedua anak sibling hitam
             if ((w == NULL) ||
                 ((w->left == NULL  || w->left->color == BLACK) &&
                  (w->right == NULL || w->right->color == BLACK))) {
@@ -369,7 +390,7 @@ void fixDelete(tnodes *x, tnodes *xParent) {
                 x = xParent;
                 xParent = x->parent;
             } else {
-                // anak kanan sibling hitam
+                // Case 3: anak kanan sibling hitam
                 if (w->right == NULL || w->right->color == BLACK) {
                     if (w->left != NULL) w->left->color = BLACK;
                     w->color = RED;
@@ -377,7 +398,7 @@ void fixDelete(tnodes *x, tnodes *xParent) {
                     w = xParent->right;
                 }
 
-                // anak kanan sibling merah
+                // Case 4: anak kanan sibling merah
                 w->color = xParent->color;
                 xParent->color = BLACK;
                 if (w->right != NULL) w->right->color = BLACK;
@@ -388,7 +409,7 @@ void fixDelete(tnodes *x, tnodes *xParent) {
         } else {
             tnodes *w = xParent->left; // sibling (mirror)
 
-            // case 1 mirror
+            // Case 1 mirror
             if (w != NULL && w->color == RED) {
                 w->color = BLACK;
                 xParent->color = RED;
@@ -396,7 +417,7 @@ void fixDelete(tnodes *x, tnodes *xParent) {
                 w = xParent->left;
             }
 
-            // case 2 mirror
+            // Case 2 mirror
             if ((w == NULL) ||
                 ((w->right == NULL || w->right->color == BLACK) &&
                  (w->left == NULL  || w->left->color == BLACK))) {
@@ -404,7 +425,7 @@ void fixDelete(tnodes *x, tnodes *xParent) {
                 x = xParent;
                 xParent = x->parent;
             } else {
-                // case 3 mirror
+                // Case 3 mirror
                 if (w->left == NULL || w->left->color == BLACK) {
                     if (w->right != NULL) w->right->color = BLACK;
                     w->color = RED;
@@ -412,7 +433,7 @@ void fixDelete(tnodes *x, tnodes *xParent) {
                     w = xParent->left;
                 }
 
-                // case 4 mirror
+                // Case 4 mirror
                 w->color = xParent->color;
                 xParent->color = BLACK;
                 if (w->left != NULL) w->left->color = BLACK;
@@ -426,7 +447,12 @@ void fixDelete(tnodes *x, tnodes *xParent) {
     if (x != NULL) x->color = BLACK;
 }
 
-// DELETE ROOM
+
+/*
+=======================
+  DELETE ROOM
+=======================
+*/
 void deleteRoom(int roomNumber) {
     tnodes *z = searchRoom(roomNumber);
 
@@ -447,19 +473,19 @@ void deleteRoom(int roomNumber) {
     int yOriginalColor = y->color;
 
     if (z->left == NULL) {
-        // ga punya anak kiri
+        // Kasus: tidak punya anak kiri
         x = z->right;
         xParent = z->parent;
         transplant(z, z->right);
 
     } else if (z->right == NULL) {
-        // ga punya anak kanan
+        // Kasus: tidak punya anak kanan
         x = z->left;
         xParent = z->parent;
         transplant(z, z->left);
 
     } else {
-        // punya dua anak -> cari successor (minimum di subtree kanan)
+        // Kasus: punya dua anak -> cari successor (minimum di subtree kanan)
         y = findMinimum(z->right);
         yOriginalColor = y->color;
         x = y->right;
