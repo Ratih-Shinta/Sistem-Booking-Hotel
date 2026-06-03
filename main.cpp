@@ -34,6 +34,13 @@ tnodes* searchRoom(int roomNumber);
 void searchRoomMenu();
 void bookRoom(int roomNumber, char customerName[]);
 void bookRoomMenu();
+void cancelBooking(int roomNumber);
+void cancelBookingMenu();
+void deleteRoom(int roomNumber);
+void deleteRoomMenu();
+void displayAscending(tnodes *node);
+void displayDescending(tnodes *node);
+void viewAllRoomsMenu();
 
 
 /*
@@ -196,31 +203,6 @@ void insertRoom(int roomNumber, char roomType[], int price) {
     printf("Kamar %d berhasil ditambahkan!\n", roomNumber);
 }
 
-void insertRoomMenu() {
-    int roomNumber;
-    char roomType[30];
-    int price;
-    char choice;
-
-    do {
-        printf("\n=== TAMBAH KAMAR ===\n");
-        printf("Nomor kamar  : ");
-        scanf("%d", &roomNumber);
-
-        printf("Tipe kamar   : ");
-        scanf(" %[^\n]", roomType);
-
-        printf("Harga        : Rp");
-        scanf("%d", &price);
-
-        insertRoom(roomNumber, roomType, price);
-
-        printf("Input kamar lagi? [y/n]: ");
-        scanf(" %c", &choice);
-
-    } while (choice == 'y' || choice == 'Y');
-}
-
 
 tnodes* searchRoom(int roomNumber) {
     tnodes *current = root;
@@ -235,27 +217,6 @@ tnodes* searchRoom(int roomNumber) {
     }
 
     return NULL;
-}
-
-void searchRoomMenu() {
-    int roomNumber;
-
-    printf("\n=== CARI KAMAR ===\n");
-    printf("Nomor kamar: ");
-    scanf("%d", &roomNumber);
-
-    tnodes *found = searchRoom(roomNumber);
-
-    if (found == NULL) {
-        printf("Kamar %d tidak ditemukan.\n", roomNumber);
-    } else {
-        printf("\n--- Detail Kamar ---\n");
-        printf("Nomor        : %d\n", found->roomNumber);
-        printf("Tipe         : %s\n", found->roomType);
-        printf("Harga        : Rp%d\n", found->price);
-        printf("Status       : %s\n", found->status);
-        printf("Dipesan oleh : %s\n", found->bookedBy);
-    }
 }
 
 // BOOKING ROOM
@@ -280,20 +241,6 @@ void bookRoom(int roomNumber, char customerName[]) {
            roomNumber, customerName);
 }
 
-void bookRoomMenu() {
-    int roomNumber;
-    char customerName[50];
-
-    printf("\n=== BOOKING KAMAR ===\n");
-    printf("Nomor kamar  : ");
-    scanf("%d", &roomNumber);
-
-    printf("Nama pemesan : ");
-    scanf(" %[^\n]", customerName);
-
-    bookRoom(roomNumber, customerName);
-}
-
 // CANCEL BOOKING
 void cancelBooking(int roomNumber) {
     tnodes *target = searchRoom(roomNumber);
@@ -313,16 +260,6 @@ void cancelBooking(int roomNumber) {
 
     strcpy(target->status, "avail");
     strcpy(target->bookedBy, "-");
-}
-
-void cancelBookingMenu() {
-    int roomNumber;
-
-    printf("\n=== CANCEL BOOKING ===\n");
-    printf("Nomor kamar  : ");
-    scanf("%d", &roomNumber);
-
-    cancelBooking(roomNumber);
 }
 
 //  transplant (helper delete)
@@ -487,6 +424,135 @@ void deleteRoom(int roomNumber) {
     printf("Kamar %d berhasil dihapus.\n", roomNumber);
 }
 
+/*
+INTERFACE UI KAMAR HOTEL (UI MENU, ASCII ART, VIEW ALL ASC/DESC)
+*/
+
+//bantu print tabel dari urutan kecil ke besar dan sebaliknya :3
+void displayAscending(tnodes *node) {
+    if (node != NULL) {
+        displayAscending(node->left);
+        printf("| %-11d | %-20s | Rp%-9d | %-10s | %-18s |\n",
+               node->roomNumber, node->roomType, node->price, //
+               node->status, node->bookedBy);
+        displayAscending(node->right);
+    }
+}
+
+void displayDescending(tnodes *node) {
+    if (node != NULL) {
+        displayDescending(node->right);
+        printf("| %-11d | %-20s | Rp%-9d | %-10s | %-18s |\n",
+               node->roomNumber, node->roomType, node->price,
+               node->status, node->bookedBy);
+        displayDescending(node->left);
+    }
+}
+
+/*
+menu utama dari view all rooms dalam bentuk format "TABEL"
+*/
+void viewAllRoomsMenu() {
+    int sortChoice = 1;
+    printf("\n==========================\n");
+    printf("\n=== SEMUA KAMAR (ASC) ====\n");
+    printf("============================\n");
+    printf("1. Urutkan dari nomor kamar terkecil ke terbesar (ASC)\n");
+    printf("2. Urutkan dari nomor kamar terbesar ke terkecil (DESC)\n");
+    printf("Pilih opsi (1/2): ");
+    scanf("%d", &sortChoice);
+
+    if(root == NULL) {
+        printf("Belum ada kamar yang terdaftar.\n");
+        return;
+    }
+
+    printf("\n===================================================================================\n");
+    printf("| Nomor Kamar | Tipe Kamar           | Harga      | Status     | Dipesan Oleh       |\n");
+    printf("=====================================================================================\n");
+
+    if(sortChoice == 2) {
+        displayDescending(root);
+    } else {
+        displayAscending(root);
+    }
+
+    printf("=====================================================================================\n");
+}
+
+/*
+input dan output menu
+*/
+void insertRoomMenu() {
+    int roomNumber;
+    char roomType[30];
+    int price;
+    char choice;
+
+    do {
+        printf("\n=== TAMBAH KAMAR ===\n");
+        printf("Nomor kamar  : ");
+        scanf("%d", &roomNumber);
+
+        printf("Tipe kamar   : ");
+        scanf(" %[^\n]", roomType);
+
+        printf("Harga        : Rp");
+        scanf("%d", &price);
+
+        insertRoom(roomNumber, roomType, price);
+
+        printf("Input kamar lagi? [y/n]: ");
+        scanf(" %c", &choice);
+
+    } while (choice == 'y' || choice == 'Y');
+}
+
+void searchRoomMenu() {
+    int roomNumber;
+
+    printf("\n=== CARI KAMAR ===\n");
+    printf("Nomor kamar: ");
+    scanf("%d", &roomNumber);
+
+    tnodes *found = searchRoom(roomNumber);
+
+    if (found == NULL) {
+        printf("Kamar %d tidak ditemukan.\n", roomNumber);
+    } else {
+        printf("\n--- Detail Kamar ---\n");
+        printf("Nomor        : %d\n", found->roomNumber);
+        printf("Tipe         : %s\n", found->roomType);
+        printf("Harga        : Rp%d\n", found->price);
+        printf("Status       : %s\n", found->status);
+        printf("Dipesan oleh : %s\n", found->bookedBy);
+    }
+}
+
+void bookRoomMenu() {
+    int roomNumber;
+    char customerName[50];
+
+    printf("\n=== BOOKING KAMAR ===\n");
+    printf("Nomor kamar  : ");
+    scanf("%d", &roomNumber);
+
+    printf("Nama pemesan : ");
+    scanf(" %[^\n]", customerName);
+
+    bookRoom(roomNumber, customerName);
+}
+
+void cancelBookingMenu() {
+    int roomNumber;
+
+    printf("\n=== CANCEL BOOKING ===\n");
+    printf("Nomor kamar  : ");
+    scanf("%d", &roomNumber);
+
+    cancelBooking(roomNumber);
+}
+
 void deleteRoomMenu() {
     int roomNumber;
 
@@ -497,15 +563,62 @@ void deleteRoomMenu() {
     deleteRoom(roomNumber);
 }
 
+
 /*
 ini function main
 */
 int main() {
-    insertRoomMenu(); 
-    searchRoomMenu(); 
-    bookRoomMenu();
-    cancelBookingMenu(); 
-    deleteRoomMenu();
+    int choice;
+
+    while(1){
+        printf("\n)");
+        printf("__________ .__                                     .__            __         .__   \n");
+        printf("\\______   \\|__|  ____   __ __   ______        |  |__    ____ _/  |_   ____ |  |  \n");
+        printf(" |    |  _/|  | /    \\ |  |  \\ /  ___/  _____ |  |  \\  /  _ \\\\   __\\_/ __ \\|  |  \n");
+        printf(" |    |   \\|  ||   |  \\|  |  / \\___ \\  /_____/|   Y  \\(  <_> )|  |  \\  ___/|  |__\n");
+        printf(" |______  /|__||___|  /|____/ /____  >        |___|  / \\____/ |__|   \\___  >|____/\n");
+        printf("        \\/          \\/             \\/              \\/                    \\/       \n");
+        printf("\n======================================================================================\n");
+        printf("============================ BINUS HOTEL MANAGEMENT SYSTEM  ============================\n");
+        printf("========================================================================================\n");
+        printf("1. Tambah Kamar\n");
+        printf("2. Cari Kamar\n");
+        printf("3. Booking Kamar\n");
+        printf("4. Lihat Semua Kamar (ASC/DESC Table)\n");
+        printf("5. Cancel Booking\n");
+        printf("6. Hapus Kamar\n");
+        printf("7. Keluar Program\n");
+        printf("\n======================================================================================\n");
+        printf("Pilih menu (1-7): ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                insertRoomMenu();
+                break;
+            case 2:
+                searchRoomMenu();
+                break;
+            case 3:
+                bookRoomMenu();
+                break;
+            case 4:
+                viewAllRoomsMenu();
+                break;
+            case 5:
+                cancelBookingMenu();
+                break;
+            case 6:
+                deleteRoomMenu();
+                break;
+            case 7:
+                printf("Terima kasih telah menggunakan BINUS Hotel, Sampai jumpa!\n");
+                exit(0);
+            default:
+                printf("Pilihan tidak valid. Silakan masukan angka 1-7.\n");
+        }
+
+    }
 
     return 0;
 }
