@@ -2,9 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
-Struktur node
-*/
+// Struktur node
 #define RED 0
 #define BLACK 1
 
@@ -21,9 +19,7 @@ typedef struct tnodes {
 
 tnodes *root = NULL;
 
-/*
-call function ditaro di sini
-*/
+// call function ditaro di sini
 tnodes* createNode(int roomNumber, char roomType[], int price);
 void leftRotate(tnodes *x);
 void rightRotate(tnodes *x);
@@ -43,11 +39,7 @@ void displayDescending(tnodes *node);
 void viewAllRoomsMenu();
 
 
-/*
-=======================
-  CREATE NODE
-=======================
-*/
+//   CREATE NODE
 tnodes* createNode(int roomNumber, char roomType[], int price) {
     tnodes* newNode = (tnodes*) malloc(sizeof(tnodes));
 
@@ -66,11 +58,7 @@ tnodes* createNode(int roomNumber, char roomType[], int price) {
 }
 
 
-/*
-=======================
-  ROTASI
-=======================
-*/
+//   ROTASI
 void leftRotate(tnodes *x) {
     tnodes *y = x->right;
     x->right = y->left;
@@ -112,11 +100,7 @@ void rightRotate(tnodes *x) {
 }
 
 
-/*
-=======================
-  FIX INSERT (COLORING)
-=======================
-*/
+//   FIX INSERT
 void fixInsert(tnodes *z) {
     while (z->parent != NULL && z->parent->color == RED) {
         tnodes *grandparent = z->parent->parent;
@@ -164,11 +148,7 @@ void fixInsert(tnodes *z) {
 }
 
 
-/*
-=======================
-  INSERT ROOM
-=======================
-*/
+//   INSERT ROOM
 void insertRoom(int roomNumber, char roomType[], int price) {
     tnodes *newNode = createNode(roomNumber, roomType, price);
 
@@ -424,9 +404,8 @@ void deleteRoom(int roomNumber) {
     printf("Kamar %d berhasil dihapus.\n", roomNumber);
 }
 
-/*
-INTERFACE UI KAMAR HOTEL (UI MENU, ASCII ART, VIEW ALL ASC/DESC)
-*/
+
+// INTERFACE UI KAMAR HOTEL (UI MENU, ASCII ART, VIEW ALL ASC/DESC)
 
 //bantu print tabel dari urutan kecil ke besar dan sebaliknya :3
 void displayAscending(tnodes *node) {
@@ -449,9 +428,7 @@ void displayDescending(tnodes *node) {
     }
 }
 
-/*
-menu utama dari view all rooms dalam bentuk format "TABEL"
-*/
+// menu utama dari view all rooms dalam bentuk format "TABEL"
 void viewAllRoomsMenu() {
     int sortChoice = 1;
     printf("\n==========================\n");
@@ -480,9 +457,7 @@ void viewAllRoomsMenu() {
     printf("=====================================================================================\n");
 }
 
-/*
-input dan output menu
-*/
+// input dan output menu
 void insertRoomMenu() {
     int roomNumber;
     char roomType[30];
@@ -564,9 +539,7 @@ void deleteRoomMenu() {
 }
 
 
-/*
-ini function main
-*/
+// ini function main
 int main() {
     int choice;
 
@@ -578,7 +551,7 @@ int main() {
         printf(" |    |   \\|  ||   |  \\|  |  / \\___ \\  /_____/|   Y  \\(  <_> )|  |  \\  ___/|  |__\n");
         printf(" |______  /|__||___|  /|____/ /____  >        |___|  / \\____/ |__|   \\___  >|____/\n");
         printf("        \\/          \\/             \\/              \\/                    \\/       \n");
-        printf("\n======================================================================================\n");
+        printf("\n========================================================================================\n");
         printf("============================ BINUS HOTEL MANAGEMENT SYSTEM  ============================\n");
         printf("========================================================================================\n");
         printf("1. Tambah Kamar\n");
@@ -588,7 +561,7 @@ int main() {
         printf("5. Cancel Booking\n");
         printf("6. Hapus Kamar\n");
         printf("7. Keluar Program\n");
-        printf("\n======================================================================================\n");
+        printf("\n========================================================================================\n");
         printf("Pilih menu (1-7): ");
         scanf("%d", &choice);
 
